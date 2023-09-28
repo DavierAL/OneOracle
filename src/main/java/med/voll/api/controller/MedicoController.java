@@ -2,14 +2,15 @@ package med.voll.api.controller;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import med.voll.api.addres.AddresData;
 import med.voll.api.medico.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/medicos")
@@ -32,17 +33,23 @@ public class MedicoController {
 
     @PutMapping
     @Transactional
-    public void actulizarMedico(@RequestBody @Valid UpdateMedicalData updateMedicalData) {
+    public ResponseEntity actulizarMedico(@RequestBody @Valid UpdateMedicalData updateMedicalData) {
         Medico medico = medicoRepository.getReferenceById((updateMedicalData.id()));
         medico.actulizarDatos(updateMedicalData);
+        return ResponseEntity.ok(new DataResponseMedico(medico.getId(), medico.getNombre(),
+                medico.getEmail(), medico.getTelefono(), medico.getEspecialidad().toString(),
+                new AddresData(medico.getDireccion().getCalle(),medico.getDireccion().getDistrito(),
+                        medico.getDireccion().getCiudad(),medico.getDireccion().getNumero().toString(),
+                        medico.getDireccion().getComplemento())));
     }
 
     //DELETE LOGICO
     @DeleteMapping("/{id}")
     @Transactional
-    public void deleteMedico(@PathVariable  Long id){
+    public ResponseEntity deleteMedico(@PathVariable  Long id){
         Medico medico = medicoRepository.getReferenceById(id);
         medico.desactivarMedico();
+        return ResponseEntity.noContent().build();
     }
 
     //DELETE EN BASE DE DATOS
