@@ -1,4 +1,4 @@
-package med.voll.api.addres;
+package med.voll.api.domain.addres;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

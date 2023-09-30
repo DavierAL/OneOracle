@@ -1,13 +1,13 @@
-package med.voll.api.medico;
+package med.voll.api.domain.patient;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import med.voll.api.addres.AddresData;
+import med.voll.api.domain.addres.AddresData;
 
-public record MedicalRecordData(@NotBlank
+public record PatientRecordData(
+                                @NotBlank
                                 String nombre,
                                 @NotBlank
                                 @Email
@@ -15,10 +15,7 @@ public record MedicalRecordData(@NotBlank
                                 @NotBlank
                                 String telefono,
                                 @NotBlank
-                                @Pattern(regexp = "\\d{4,8}")
-                                String documento,
-                                @NotNull
-                                Especialidad especialidad,
+                                String documentoIdentidad,
                                 @NotNull
                                 @Valid
                                 AddresData direccion) {

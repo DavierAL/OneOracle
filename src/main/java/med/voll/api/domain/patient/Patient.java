@@ -1,11 +1,10 @@
-package med.voll.api.patient;
+package med.voll.api.domain.patient;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import med.voll.api.addres.AddresData;
-import med.voll.api.addres.Direccion;
+import med.voll.api.domain.addres.Direccion;
 
 @Table(name = "paciente")
 @Entity(name = "Patient")
@@ -24,11 +23,13 @@ public class Patient {
     private String email;
     private String documento;
     private String telefono;
+    private Boolean activo;
 
     @Embedded
     private Direccion direccion;
 
     public Patient(PatientRecordData datos) {
+        this.activo = true;
         this.nombre = datos.nombre();
         this.email = datos.email();
         this.documento = datos.documentoIdentidad();
