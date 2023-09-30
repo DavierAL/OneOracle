@@ -10,6 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 
 @RestController
@@ -20,15 +23,22 @@ public class MedicoController {
     private MedicoRepository medicoRepository;
 
     @PostMapping
-    public void registrarMedico(@RequestBody @Valid MedicalRecordData datosRegistroMedico) {
-        System.out.println("El request llega correctamente");
-        medicoRepository.save(new Medico(datosRegistroMedico));
+    public ResponseEntity<DataResponseMedico> registrarMedico(@RequestBody @Valid MedicalRecordData datosRegistroMedico,
+                                          UriComponentsBuilder uriComponentsBuilder) {
+        Medico medico = medicoRepository.save(new Medico(datosRegistroMedico));
+        DataResponseMedico dataResponseMedico = new DataResponseMedico((medico.getId()), medico.getNombre(),
+                medico.getEmail(), medico.getTelefono(), medico.getEspecialidad().toString(),
+                new AddresData(medico.getDireccion().getCalle(),medico.getDireccion().getDistrito(),
+                        medico.getDireccion().getCiudad(),medico.getDireccion().getNumero().toString(),
+                        medico.getDireccion().getComplemento()));
+        URI url = uriComponentsBuilder.path("/medicos/{id}").buildAndExpand(medico.getId()).toUri();
+        return ResponseEntity.created(url).body(dataResponseMedico);
     }
 
     @GetMapping
-    public Page<DataListMedico> listadoMedico(@PageableDefault(size = 20) Pageable paginacion) {
+    public ResponseEntity<Page<DataListMedico>>  listadoMedico(@PageableDefault(size = 20) Pageable paginacion) {
         //return medicoRepository.findAll(paginacion).map(DataListMedico::new);
-        return medicoRepository.findByActivoTrue(paginacion).map(DataListMedico::new);
+        return ResponseEntity.ok(medicoRepository.findByActivoTrue(paginacion).map(DataListMedico::new));
     }
 
     @PutMapping
@@ -52,11 +62,15 @@ public class MedicoController {
         return ResponseEntity.noContent().build();
     }
 
-    //DELETE EN BASE DE DATOS
-    // @DeleteMapping("/{id}")
-    // @Transactional
-    //public void deleteMedico(@PathVariable  Long id){
-    //   Medico medico = medicoRepository.getReferenceById(id);
-    //     medicoRepository.delete(medico);
-    //}
+    @GetMapping("/{id}")
+    @Transactional
+    public ResponseEntity<DataResponseMedico> retornaDatosMedico(@PathVariable  Long id){
+        Medico medico = medicoRepository.getReferenceById(id);
+        var datosMedico = new DataResponseMedico((medico.getId()), medico.getNombre(),
+                medico.getEmail(), medico.getTelefono(), medico.getEspecialidad().toString(),
+                new AddresData(medico.getDireccion().getCalle(),medico.getDireccion().getDistrito(),
+                        medico.getDireccion().getCiudad(),medico.getDireccion().getNumero().toString(),
+                        medico.getDireccion().getComplemento()));
+        return ResponseEntity.ok(datosMedico);
+    }
 }

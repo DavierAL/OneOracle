@@ -34,4 +34,7 @@ public class Patient {
         this.documento = datos.documentoIdentidad();
         this.telefono = datos.telefono();
     }
+
+    public void eliminar() {
+    }
 }
